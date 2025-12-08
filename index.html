@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI para PMs - Modos de Falhar | Augusto Rückert</title>
+    
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/theme/black.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==========================================
+           VARIABLES & BASE STYLES
+           ========================================== */
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a25;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --accent-blue: #00d4ff;
+            --accent-purple: #7c3aed;
+            --accent-gradient: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --font-main: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        .reveal-viewport {
+            background: var(--bg-primary);
+            background-image: 
+                radial-gradient(ellipse at 20% 80%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(0, 212, 255, 0.08) 0%, transparent 50%);
+        }
+
+        .reveal {
+            font-family: var(--font-main);
+            font-size: 32px;
+            color: var(--text-primary);
+        }
+
+        .reveal .slides {
+            text-align: left;
+        }
+
+        .reveal .slides section {
+            padding: 40px 60px;
+        }
+
+        /* ==========================================
+           TYPOGRAPHY
+           ========================================== */
+        .reveal h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .reveal h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.8rem;
+            letter-spacing: -0.01em;
+        }
+
+        .reveal h3 {
+            font-size: 2rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.6rem;
+        }
+
+        .reveal p {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .reveal small, .reveal .source {
+            font-size: 1rem;
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        .reveal strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .reveal em {
+            color: var(--accent-blue);
+            font-style: italic;
+        }
+
+        .reveal del {
+            color: var(--text-primary);
+            text-decoration: line-through;
+        }
+
+        /* ==========================================
+           SLIDE TYPES
+           ========================================== */
+        
+        /* Title/Divider Slides */
+        .reveal .divider {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100%;
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        }
+
+        .reveal .divider h1 {
+            font-size: 4rem;
+        }
+
+        .reveal .divider h2 {
+            font-size: 3rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .reveal .divider .subtitle {
+            font-size: 1.8rem;
+            color: var(--text-muted);
+            margin-top: 1rem;
+        }
+
+        /* Title Slide Special */
+        .reveal .title-slide {
+            text-align: center;
+        }
+
+        .reveal .title-slide h1 {
+            font-size: 4.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .reveal .title-slide .author {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-top: 3rem;
+        }
+
+        .reveal .title-slide .date {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+
+        /* Failure Mode Dividers */
+        .reveal .failure-divider {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, var(--bg-primary) 100%);
+        }
+
+        .reveal .failure-divider .mode-number {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: var(--danger);
+            margin-bottom: 1rem;
+        }
+
+        .reveal .failure-divider h2 {
+            font-size: 3.5rem;
+            color: var(--text-primary);
+        }
+
+        /* Part Dividers */
+        .reveal .part-divider {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, var(--bg-primary) 100%);
+        }
+
+        .reveal .part-divider .part-label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
+            color: var(--accent-purple);
+            margin-bottom: 1.5rem;
+        }
+
+        /* ==========================================
+           BIG NUMBERS & STATS
+           ========================================== */
+        .reveal .big-number {
+            font-size: 6rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin: 0.5rem 0;
+        }
+
+        .reveal .big-number.danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #ff6b6b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .reveal .big-number.success {
+            background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .reveal .stat-container {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .reveal .stat-label {
+            font-size: 1.8rem;
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* ==========================================
+           LISTS & BULLETS
+           ========================================== */
+        .reveal ul {
+            list-style: none;
+            padding: 0;
+            margin: 1.5rem 0;
+        }
+
+        .reveal ul li {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+        }
+
+        .reveal ul li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .reveal ul.check-list li::before {
+            content: '✓';
+            color: var(--success);
+        }
+
+        .reveal ul.cross-list li::before {
+            content: '✗';
+            color: var(--danger);
+        }
+
+        .reveal ul.numbered li {
+            counter-increment: item;
+        }
+
+        .reveal ul.numbered li::before {
+            content: counter(item) '.';
+            color: var(--accent-purple);
+            font-weight: 700;
+        }
+
+        /* ==========================================
+           BOXES & HIGHLIGHTS
+           ========================================== */
+        .reveal .highlight-box {
+            background: var(--bg-secondary);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .reveal .highlight-box.accent {
+            border-left: 4px solid var(--accent-purple);
+        }
+
+        .reveal .highlight-box.warning {
+            border-left: 4px solid var(--danger);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .reveal .highlight-box.success {
+            border-left: 4px solid var(--success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        /* ==========================================
+           QUOTES
+           ========================================== */
+        .reveal .quote {
+            position: relative;
+            padding: 2rem 2.5rem;
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent-purple);
+            border-radius: 0 12px 12px 0;
+            margin: 2rem 0;
+        }
+
+        .reveal .quote p {
+            font-style: italic;
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .reveal .quote .attribution {
+            margin-top: 1.5rem;
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-style: normal;
+        }
+
+        .reveal .quote::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-size: 5rem;
+            color: var(--accent-purple);
+            opacity: 0.3;
+            font-family: Georgia, serif;
+        }
+
+        /* ==========================================
+           GRIDS & LAYOUTS
+           ========================================== */
+        .reveal .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .reveal .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .reveal .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .reveal .grid-box {
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .reveal .grid-box .icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .reveal .grid-box h4 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.8rem;
+        }
+
+        .reveal .grid-box p {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        /* ==========================================
+           FRAMEWORK & TECHNIQUE SLIDES
+           ========================================== */
+        .reveal .framework {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 1rem 0;
+        }
+
+        .reveal .framework h3 {
+            color: var(--accent-blue);
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .reveal .technique {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 1rem 0;
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        .reveal .technique-number {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        /* ==========================================
+           FLOW DIAGRAMS (CSS)
+           ========================================== */
+        .reveal .flow-cycle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 2rem 0;
+        }
+
+        .reveal .flow-cycle .flow-item {
+            background: var(--bg-secondary);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .reveal .flow-cycle .flow-arrow {
+            color: var(--accent-purple);
+            font-size: 1.5rem;
+        }
+
+        /* ==========================================
+           TWO COLUMN COMPARISON
+           ========================================== */
+        .reveal .comparison {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 2rem;
+            align-items: start;
+            margin: 2rem 0;
+        }
+
+        .reveal .comparison .col {
+            padding: 1.5rem;
+        }
+
+        .reveal .comparison .col h4 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-purple);
+        }
+
+        .reveal .comparison .divider-line {
+            width: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            height: 100%;
+            min-height: 300px;
+        }
+
+        .reveal .comparison .arrow-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            color: var(--accent-blue);
+            font-size: 1.5rem;
+            padding-top: 4rem;
+        }
+
+        /* ==========================================
+           CHECKLIST
+           ========================================== */
+        .reveal .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .reveal .checklist li {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 1.3rem;
+        }
+
+        .reveal .checklist li::before {
+            content: '☐';
+            color: var(--accent-blue);
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        /* ==========================================
+           INTERACTIVE SLIDES
+           ========================================== */
+        .reveal .interactive {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, var(--bg-primary) 100%);
+            text-align: center;
+        }
+
+        .reveal .interactive h2 {
+            color: var(--accent-purple);
+        }
+
+        .reveal .interactive .prompt {
+            font-size: 2rem;
+            color: var(--text-primary);
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* ==========================================
+           LESSON/INSIGHT BOXES
+           ========================================== */
+        .reveal .lesson {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 16px;
+            padding: 2rem 2.5rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .reveal .lesson-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .reveal .lesson p {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        /* ==========================================
+           CODE BLOCKS
+           ========================================== */
+        .reveal .code-block {
+            background: #1e1e2e;
+            border-radius: 8px;
+            padding: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            color: #cdd6f4;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .reveal .code-block .keyword {
+            color: #cba6f7;
+        }
+
+        .reveal .code-block .string {
+            color: #a6e3a1;
+        }
+
+        .reveal .code-block .comment {
+            color: #6c7086;
+        }
+
+        /* ==========================================
+           PROGRESS BARS / VISUAL DATA
+           ========================================== */
+        .reveal .progress-bar-container {
+            margin: 1rem 0;
+        }
+
+        .reveal .progress-bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .reveal .progress-bar {
+            height: 24px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .reveal .progress-bar-fill {
+            height: 100%;
+            border-radius: 12px;
+            background: var(--accent-gradient);
+            transition: width 1s ease-out;
+        }
+
+        /* ==========================================
+           IFRAME / VIDEO
+           ========================================== */
+        .reveal .video-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reveal .video-container iframe {
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .reveal .video-container .caption {
+            margin-top: 1.5rem;
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        /* ==========================================
+           BIBLIOGRAPHY
+           ========================================== */
+        .reveal .bibliography {
+            columns: 2;
+            column-gap: 3rem;
+        }
+
+        .reveal .bibliography h4 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--accent-purple);
+            margin-bottom: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .reveal .bibliography h4:first-child {
+            margin-top: 0;
+        }
+
+        .reveal .bibliography ul {
+            margin: 0;
+        }
+
+        .reveal .bibliography li {
+            font-size: 1rem;
+            padding-left: 1.8rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .reveal .bibliography li::before {
+            font-size: 1rem;
+        }
+
+        /* ==========================================
+           CONTACT SLIDE
+           ========================================== */
+        .reveal .contact-slide {
+            text-align: center;
+        }
+
+        .reveal .contact-slide h1 {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+        }
+
+        .reveal .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 3rem;
+        }
+
+        .reveal .contact-info a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 1.3rem;
+            transition: color 0.3s ease;
+        }
+
+        .reveal .contact-info a:hover {
+            color: var(--accent-blue);
+        }
+
+        /* ==========================================
+           ANIMATIONS
+           ========================================== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        .reveal .animate-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .reveal .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* ==========================================
+           FRAGMENT ANIMATIONS
+           ========================================== */
+        .reveal .fragment.fade-in {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .reveal .fragment.fade-in.visible {
+            opacity: 1;
+        }
+
+        /* ==========================================
+           RESPONSIVE
+           ========================================== */
+        @media screen and (max-width: 1200px) {
+            .reveal {
+                font-size: 24px;
+            }
+            
+            .reveal .big-number {
+                font-size: 4rem;
+            }
+            
+            .reveal .grid-3,
+            .reveal .grid-4 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- ==========================================
+                 PARTE 1: O PARADOXO
+                 ========================================== -->
+
+            <!-- Slide 1: Título -->
+            <section class="title-slide divider" data-transition="zoom">
+                <h1>AI para PMs</h1>
+                <h2>Modos de falhar</h2>
+                <p class="author">Augusto Rückert</p>
+                <p class="date">Dezembro/2025</p>
+            </section>
+
+            <!-- Slide 2: Todo mundo usa -->
+            <section>
+                <h2>Todo mundo tá usando AI o tempo todo</h2>
+                <p class="source" style="text-align: center; margin-top: 2rem;">Aquele influencer de Produto dizendo que você tem que virar AI PM amanhã</p>
+            </section>
+
+            <!-- Slide 3: Vídeo iPod -->
+            <section class="video-container">
+                <iframe width="1120" height="630" 
+                        src="https://www.youtube.com/embed/sad-xhIZgz8" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+                <p class="caption">Pico de vendas: 22,73 milhões de iPod vendidos no primeiro trimestre de 2009. — Statista</p>
+            </section>
+
+            <!-- Slide 4: Apresentação pessoal -->
+            <section>
+                <p style="font-size: 1.8rem; color: var(--text-primary);">Essa apresentação não é um manifesto luddita.</p>
+                <p style="margin-top: 2rem; font-size: 1.5rem;">Olá, sou o <strong>Augusto</strong>, atualmente Staff PM no <span style="color: var(--accent-purple);">Nubank</span>.</p>
+            </section>
+
+            <!-- Slide 5: Quem usa IA - Interativo -->
+            <section class="interactive">
+                <h2>Todo mundo quem...</h2>
+                <p class="fragment" style="margin-top: 1.5rem; font-size: 2rem;">Quem usa IA semanalmente no trabalho?</p>
+                <p class="fragment" style="margin-top: 1.5rem; font-size: 2rem;">Diariamente?</p>
+                <p class="fragment" style="margin-top: 1.5rem; font-size: 2rem;">Não consegue mais trabalhar sem IA?</p>
+                <p class="fragment source" style="margin-top: 3rem;">(Spoiler: usei AI pra montar essa apresentação)</p>
+            </section>
+
+            <!-- Slide 6: Estatística 86% -->
+            <section class="stat-container">
+                <p class="big-number">86%</p>
+                <p class="stat-label">das empresas esperam que AI transforme seu negócio até 2030.</p>
+                <p class="source" style="margin-top: 2rem;">World Economic Forum — Future of Jobs Report 2025</p>
+            </section>
+
+            <!-- Slide 7: Uso por geração -->
+            <section>
+                <p class="big-number" style="font-size: 4rem;">70%</p>
+                <p style="font-size: 1.6rem; margin-bottom: 2rem;">dos funcionários já utilizam IA nos seus trabalhos</p>
+                
+                <h3 style="color: var(--accent-purple); margin-bottom: 1.5rem;">POR GERAÇÃO:</h3>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-bar-label">
+                        <span>Gen Z</span>
+                        <span style="color: var(--accent-blue);">82%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" style="width: 82%;"></div>
+                    </div>
+                </div>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-bar-label">
+                        <span>Gen Y (Millennials)</span>
+                        <span style="color: var(--accent-blue);">73%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" style="width: 73%;"></div>
+                    </div>
+                </div>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-bar-label">
+                        <span>Gen X</span>
+                        <span style="color: var(--accent-blue);">60%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" style="width: 60%;"></div>
+                    </div>
+                </div>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-bar-label">
+                        <span>Baby Boomers</span>
+                        <span style="color: var(--accent-blue);">52%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" style="width: 52%;"></div>
+                    </div>
+                </div>
+                
+                <p class="source" style="margin-top: 1.5rem;">London School of Economics — Bridging the Generational AI Gap</p>
+            </section>
+
+            <!-- Slide 8: MAS 95% -->
+            <section class="stat-container">
+                <p style="font-size: 2rem; color: var(--text-muted); margin-bottom: 1rem;">MAS...</p>
+                <p class="big-number danger">95%</p>
+                <p class="stat-label">das empresas <strong style="color: var(--danger);">FALHARAM</strong> em implementar GenAI de modo embedado ou específico</p>
+                <p class="source" style="margin-top: 2rem;">MIT NANDA — State of AI in Business 2025</p>
+            </section>
+
+            <!-- Slide 9: Drop de uso -->
+            <section class="stat-container">
+                <p class="big-number" style="font-size: 4.5rem;">54%</p>
+                <p style="font-size: 1.4rem; color: var(--text-secondary);">usaram IA nos últimos 12 meses</p>
+                
+                <p style="font-size: 4rem; color: var(--danger); margin: 1.5rem 0;">↓</p>
+                
+                <p style="font-size: 1.2rem; color: var(--text-muted);">apenas</p>
+                <p class="big-number danger" style="font-size: 4.5rem;">14%</p>
+                <p style="font-size: 1.4rem; color: var(--text-secondary);">usam <strong>DIARIAMENTE</strong></p>
+                
+                <p class="source" style="margin-top: 2rem;">PwC Global Workforce Hopes and Fears Survey 2025</p>
+            </section>
+
+            <!-- Slide 10: Observação pessoal -->
+            <section style="text-align: center;">
+                <p style="font-size: 1.8rem; color: var(--text-secondary); max-width: 800px; margin: 0 auto;">
+                    Também estou me baseando no que tenho visto<br>e conversado com outras PMs.
+                </p>
+            </section>
+
+            <!-- Slide 11: PMs em risco -->
+            <section>
+                <h2>Isso serve pra todo mundo.<br><span style="color: var(--danger);">Mas PMs estão em risco especial.</span></h2>
+                
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">REALIDADE:</h3>
+                
+                <ul class="numbered">
+                    <li class="fragment">Muitos PMs ainda são "backlog manager glorificados" → <strong>AI faz/fará isso melhor que você.</strong></li>
+                    <li class="fragment">Mesmo antes das GenAI nós JÁ éramos pressionados a escrever, prototipar, analisar dados e até a codar → <strong>Expectativa dobrou, tempo não</strong></li>
+                    <li class="fragment">E ouvimos: "Com AI fazendo por você, seja mais estratégico!" → <strong>Carga dobrou, ainda não tem tempo sobrando pra estratégia</strong></li>
+                </ul>
+                
+                <p class="fragment" style="margin-top: 2rem; font-size: 1.6rem; color: var(--accent-blue);">Nessa situação, como os PMs falham com IA?</p>
+            </section>
+
+            <!-- ==========================================
+                 PARTE 2: OS 4 MODOS DE FALHA
+                 ========================================== -->
+
+            <!-- Slide 12: Lista dos modos -->
+            <section class="part-divider" data-transition="zoom">
+                <p class="part-label">PARTE 2</p>
+                <h2>3 modos de falha:</h2>
+                <ul style="text-align: left; max-width: 600px; margin: 2rem auto;">
+                    <li class="fragment"><strong>Modo 1:</strong> Otimizar para velocidade</li>
+                    <li class="fragment"><strong>Modo 2:</strong> Confundir volume com valor</li>
+                    <li class="fragment"><strong>Modo 3:</strong> Confiar demais</li>
+                </ul>
+            </section>
+
+            <!-- Slide 13: Divider Modo 1 -->
+            <section class="failure-divider divider" data-transition="zoom">
+                <p class="mode-number">Modo de Falha #1</p>
+                <h2>Otimizar para velocidade</h2>
+            </section>
+
+            <!-- Slide 14: PRD ChatGPT -->
+            <section class="interactive">
+                <p class="prompt">Quem já recebeu um PRD ou outro documento com cara de puro ChatGPT?</p>
+            </section>
+
+            <!-- Slide 15: Sintomas velocidade -->
+            <section>
+                <h2>SINTOMAS:</h2>
+                <ul class="check-list" style="margin-top: 2rem;">
+                    <li class="fragment">"Agora faço PRDs em 10 min em vez de 4 dias"</li>
+                    <li class="fragment">"Gero 50 user stories em 5 minutos"</li>
+                    <li class="fragment">"Relatório instantâneo"</li>
+                </ul>
+            </section>
+
+            <!-- Slide 16: Realidade velocidade -->
+            <section>
+                <h2>REALIDADE:</h2>
+                <div class="grid-4" style="margin-top: 2rem;">
+                    <div class="grid-box fragment">
+                        <div class="icon">👨‍💻</div>
+                        <h4>Dev</h4>
+                        <p>Falta contexto, regras do produto atual</p>
+                    </div>
+                    <div class="grid-box fragment">
+                        <div class="icon">🤝</div>
+                        <h4>Stakeholder</h4>
+                        <p>Desconexão com problema real</p>
+                    </div>
+                    <div class="grid-box fragment">
+                        <div class="icon">👔</div>
+                        <h4>Líder</h4>
+                        <p>Perde tempo: 10min viram 1 turno de revisão</p>
+                    </div>
+                    <div class="grid-box fragment">
+                        <div class="icon">🪞</div>
+                        <h4>Você</h4>
+                        <p>Não consegue defender o que escreveu</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 17: Lição 1 -->
+            <section>
+                <div class="lesson">
+                    <p class="lesson-label">LIÇÃO</p>
+                    <p>Velocidade é consequência da proficiência.<br><strong>Não é objetivo.</strong></p>
+                </div>
+            </section>
+
+            <!-- Slide 18: Divider Modo 2 -->
+            <section class="failure-divider divider" data-transition="zoom">
+                <p class="mode-number">Modo de Falha #2</p>
+                <h2>Confundir volume com valor</h2>
+            </section>
+
+            <!-- Slide 19: Tamanho PRD -->
+            <section class="interactive">
+                <p class="prompt">Qual o tamanho recorde de páginas em um PRD "inicial" vocês já receberam?</p>
+            </section>
+
+            <!-- Slide 20: Sintomas volume -->
+            <section>
+                <h2>SINTOMAS:</h2>
+                <ul style="margin-top: 2rem;">
+                    <li class="fragment">PRD de <strong style="color: var(--danger);">63 páginas</strong> "super completinho", pra começar a discussão</li>
+                    <li class="fragment">Protótipos com <strong style="color: var(--danger);">47 telas</strong> em 1 dia</li>
+                    <li class="fragment">Análise competitiva de <strong style="color: var(--danger);">85 slides</strong></li>
+                </ul>
+            </section>
+
+            <!-- Slide 21: Ciclo vicioso -->
+            <section>
+                <h2 style="text-align: center; margin-bottom: 2rem;">O Ciclo Vicioso</h2>
+                <div class="flow-cycle">
+                    <div class="flow-item">IA gera muito texto</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-item">Ninguém lê</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-item">Usa IA pra sumarizar <span class="source">(perde 20-40% — Nielsen Norman)</span></div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-item">Precisa gerar mais texto "pra compensar"</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-item pulse" style="border-color: var(--danger);">🔄 volta ao início</div>
+                </div>
+            </section>
+
+            <!-- Slide 22: Resultado -->
+            <section style="text-align: center;">
+                <h3 style="color: var(--danger); margin-bottom: 1.5rem;">RESULTADO</h3>
+                <p style="font-size: 2.2rem; color: var(--text-primary); max-width: 900px; margin: 0 auto;">
+                    Ninguém está lendo, só a IA.<br>
+                    <span style="color: var(--text-muted);">Ninguém está entendendo, nem a IA.</span>
+                </p>
+            </section>
+
+            <!-- Slide 23: Lição 2 -->
+            <section>
+                <div class="lesson">
+                    <p class="lesson-label">LIÇÃO</p>
+                    <p>Mais conteúdo ≠ mais clareza</p>
+                    <p style="font-size: 1.4rem; margin-top: 1rem;">Volume gera atrito</p>
+                    <p style="font-size: 2rem; margin-top: 1rem; color: var(--accent-blue);">Clareza > Volume</p>
+                </div>
+            </section>
+
+            <!-- Slide 24: Reflexão -->
+            <section class="interactive">
+                <h3 style="margin-bottom: 2rem;">Pense no último documento que você criou com IA:</h3>
+                <ul style="text-align: left; max-width: 700px; margin: 0 auto;">
+                    <li class="fragment">Quantas pessoas leram até o fim?</li>
+                    <li class="fragment">Você mesmo leu o que a IA gerou?</li>
+                    <li class="fragment">Havia algo ali que você não conseguiria defender?</li>
+                </ul>
+                <p class="fragment source" style="margin-top: 3rem;">[Não precisa compartilhar, só sentir o desconforto]</p>
+            </section>
+
+            <!-- Slide 25: Divider Modo 3 -->
+            <section class="failure-divider divider" data-transition="zoom">
+                <p class="mode-number">Modo de Falha #3</p>
+                <h2>Confiar demais</h2>
+            </section>
+
+            <!-- Slide 26: Armadilhas -->
+            <section>
+                <h2>3 ARMADILHAS ESPECÍFICAS:</h2>
+                <ul class="numbered" style="margin-top: 2rem;">
+                    <li class="fragment">
+                        <strong>Não conseguir detectar alucinações</strong><br>
+                        <span class="source">(pior quando você não é especialista)</span>
+                    </li>
+                    <li class="fragment"><strong>Confiar sem revisar</strong></li>
+                    <li class="fragment">
+                        <strong>Tratar IA como verdade absoluta</strong><br>
+                        <span class="source">por que você "forneceu dados"</span>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Slide 27: Dados de confiança -->
+            <section>
+                <div class="highlight-box warning">
+                    <p style="font-size: 1.6rem; margin-bottom: 1rem;">
+                        IA usa <strong style="color: var(--danger);">34% MAIS</strong> linguagem confiante quando <strong style="color: var(--danger);">ERRA</strong>
+                    </p>
+                    <p style="font-size: 1.2rem; color: var(--text-muted);">
+                        "Definitely", "certainly", "without doubt" = <em>Sinais de que pode estar inventando</em>
+                    </p>
+                    <p class="source">MIT Media Lab / Nielsen Norman Group</p>
+                </div>
+                
+                <div class="highlight-box warning fragment" style="margin-top: 1.5rem;">
+                    <p style="font-size: 1.6rem;">
+                        Over-reliance causa <strong style="color: var(--danger);">27.7% degradação</strong> em tomada de decisão
+                    </p>
+                    <p class="source">Smart Learning Environments Journal</p>
+                </div>
+            </section>
+
+            <!-- Slide 28: Lição 3 -->
+            <section>
+                <div class="lesson" style="border-color: var(--danger);">
+                    <p class="lesson-label" style="color: var(--danger);">LIÇÃO</p>
+                    <p>IA alucina com confiança.<br><strong>Sua credibilidade paga o preço.</strong></p>
+                </div>
+            </section>
+
+            <!-- Slide 29: Transição para modo 4 -->
+            <section style="text-align: center;">
+                <p style="font-size: 1.5rem; color: var(--text-secondary); font-style: italic; max-width: 800px; margin: 0 auto;">
+                    Isso ataca todos os níveis, mas majoritariamente os <strong>júnior</strong> e <strong>mid</strong>.
+                </p>
+                <p class="fragment" style="margin-top: 2rem; font-size: 1.5rem; color: var(--text-muted);">
+                    Nos profissionais seniores, vejo uma falha diferente, uma quarta falha que não é sobre <em>COMO</em> usar...
+                </p>
+            </section>
+
+            <!-- Slide 30: Divider Modo 4 -->
+            <section class="failure-divider divider" data-transition="zoom">
+                <p class="mode-number">Modo de Falha #4</p>
+                <h2>Recusar a IA</h2>
+            </section>
+
+            <!-- Slide 31: 3 colunas recusa -->
+            <section>
+                <div class="grid-3">
+                    <div class="framework fragment">
+                        <h3>EMPRESA</h3>
+                        <ul>
+                            <li>Parece caro, mais caro integrar</li>
+                            <li>Medo de Shadow IT</li>
+                        </ul>
+                    </div>
+                    <div class="framework fragment">
+                        <h3>LIDERANÇA</h3>
+                        <ul>
+                            <li>Não sabe usar</li>
+                            <li>Não sabe avaliar quem usa</li>
+                            <li>Como medir evolução de skills?</li>
+                        </ul>
+                    </div>
+                    <div class="framework fragment">
+                        <h3>INDIVÍDUO</h3>
+                        <ul>
+                            <li>Curva de aprendizado íngreme — Não é aprender a usar o notepad, é aprender a usar o Photoshop</li>
+                            <li>"Sou mais rápido à mão"</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 32: GenAI é infraestrutura -->
+            <section class="divider" style="text-align: center;">
+                <h2 style="font-size: 2.5rem;">GenAI não é tendência. <span style="color: var(--accent-blue);">É infraestrutura.</span></h2>
+                <p class="fragment" style="margin-top: 2rem; font-size: 2rem; color: var(--danger);">Experiência virou passivo.</p>
+            </section>
+
+            <!-- ==========================================
+                 PARTE 3: O VERDADEIRO RISCO
+                 ========================================== -->
+
+            <!-- Slide 33: Transição verdadeiro risco -->
+            <section class="part-divider divider" data-transition="zoom">
+                <p class="part-label">PARTE 3</p>
+                <h2>4 modos de falha.</h2>
+                <p style="font-size: 1.8rem; color: var(--text-secondary); margin-top: 1rem;">Todos levam ao mesmo lugar:</p>
+                <p class="fragment" style="font-size: 2.2rem; color: var(--danger); margin-top: 1.5rem;">
+                    A IA é a gestora de produto.
+                </p>
+            </section>
+
+            <!-- Slide 34: PMs param de fazer trabalho de PM -->
+            <section>
+                <h2>MUITOS PMs PARAM DE FAZER TRABALHO DE PM</h2>
+                <ul class="cross-list" style="margin-top: 2rem;">
+                    <li class="fragment">
+                        <strong>Não falam mais com clientes</strong><br>
+                        <span class="source">(usam AI para "conversar")</span>
+                    </li>
+                    <li class="fragment">
+                        <strong>Não sintetizam dados</strong><br>
+                        <span class="source">(usam AI para comprimir)</span>
+                    </li>
+                    <li class="fragment">
+                        <strong>Não desenvolvem product sense</strong><br>
+                        <span class="source">(usam AI para gerar artefatos)</span>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Slide 35: Citação Steven Wilson -->
+            <section>
+                <div class="quote">
+                    <p>
+                        "Eu não estou tentando dizer que o iPod é inteiramente mau. Tem coisas ótimas sobre os iPods e a cultura do download. [...] E o aspecto conveniente é maravilhoso. <strong>Mas o que me preocupa é que ninguém está realmente levantando os problemas dos iPods. Existem sérios problemas para mim.</strong>"
+                    </p>
+                    <p class="attribution">— Steven Wilson, 2009<br><span style="font-size: 0.9rem;">Sobre iPods e mp3</span></p>
+                </div>
+            </section>
+
+            <!-- Slide 36: Principal problema -->
+            <section style="text-align: center;">
+                <h3 style="color: var(--text-muted); margin-bottom: 1rem;">Principal problema:</h3>
+                <p style="font-size: 3rem; color: var(--danger); font-weight: 700;">QUALIDADE</p>
+                <p class="fragment" style="margin-top: 2rem; font-size: 1.8rem; color: var(--text-secondary);">
+                    A IA gera lixo mentiroso e convincente em minutos.
+                </p>
+            </section>
+
+            <!-- Slide 37: Transição -->
+            <section class="divider" style="text-align: center;">
+                <h2 style="color: var(--accent-blue);">Então como sair disso?</h2>
+            </section>
+
+            <!-- ==========================================
+                 PARTE 4: POSTURAS FILOSÓFICAS
+                 ========================================== -->
+
+            <!-- Slide 38: Posturas -->
+            <section class="part-divider" data-transition="zoom">
+                <p class="part-label">PARTE 4</p>
+                <h2>POSTURAS FRENTE A ISSO</h2>
+                
+                <div class="grid-2" style="margin-top: 2rem;">
+                    <div>
+                        <h3 style="color: var(--accent-purple); margin-bottom: 1rem;">Filosóficas</h3>
+                        <ul>
+                            <li>Admitir a condição de cyborg</li>
+                            <li>Ficar com o problema</li>
+                            <li>Ser um pouco monstruoso</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--accent-blue); margin-bottom: 1rem;">Práticas</h3>
+                        <ul>
+                            <li>Tratar a IA como parceiro</li>
+                            <li>Pensar primeiro, IA depois</li>
+                            <li>Não delegar seu julgamento</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 39: Citações Haraway -->
+            <section>
+                <div class="quote" style="margin-bottom: 1.5rem;">
+                    <p style="font-size: 1.2rem;">
+                        "<strong>By the late twentieth century, our time, a mythic time, we are all chimeras, theorized and fabricated hybrids of machine and organism; in short, we are cyborgs.</strong> This cyborg is our ontology; it gives us our politics."
+                    </p>
+                    <p class="attribution">— A Cyborg Manifesto, Donna Haraway</p>
+                </div>
+                
+                <div class="quote fragment">
+                    <p style="font-size: 1.2rem;">
+                        "Staying with the trouble requires <strong>learning to be truly present, not as a vanishing pivot between awful or edenic pasts and apocalyptic or salvific futures</strong>, but as mortal critters entwined in myriad unfinished configurations of places, times, matters, meanings."
+                    </p>
+                    <p class="attribution">— Staying with the Trouble, Donna Haraway</p>
+                </div>
+            </section>
+
+            <!-- Slide 40: Citação Venkatesh Rao -->
+            <section>
+                <div class="quote">
+                    <p style="font-size: 1.1rem;">
+                        "[...] I'll just try to tease out the implications of surrendering to monsterhood. In brief, in 2025, this involves a few elements:<br><br>
+                        • <strong>Surrendering gleefully to technological forces and making fun of those who don't</strong>.<br>
+                        • Rejecting crisis framings...<br>
+                        • Adopting a liminal passage view instead — a Great Weirding that has delivered us into a Permaweird that can be adapted to.<br>
+                        • <strong>Being skeptical of humanism</strong>.<br>
+                        • Rejecting the reduction of the experience of the real to the experience of the political."
+                    </p>
+                    <p class="attribution">— Be Slightly Monster, Venkatesh Rao</p>
+                </div>
+            </section>
+
+            <!-- Slide 41: Síntese filosófica -->
+            <section>
+                <h2>Não estamos falando de ficção científica.</h2>
+                <p style="margin-bottom: 2rem; color: var(--text-muted);">Mas sobre o que somos e nos tornamos.</p>
+                
+                <ul class="numbered" style="margin-top: 2rem;">
+                    <li class="fragment"><strong>Já somos híbridos.</strong> Fugir é entregar-se à paralisia.</li>
+                    <li class="fragment"><strong>Parar de defender "o jeito tradicional".</strong> "Ser mais humano" não é um prêmio.</li>
+                    <li class="fragment"><strong>Não é amar/odiar a IA.</strong> É aprender como ativamente e criticamente conviver com ela</li>
+                </ul>
+            </section>
+
+            <!-- ==========================================
+                 PARTE 5: PRINCÍPIOS PRÁTICOS
+                 ========================================== -->
+
+            <!-- Slide 42: Divider Como usar bem -->
+            <section class="part-divider divider" data-transition="zoom">
+                <p class="part-label">PARTE 5</p>
+                <h2>COMO USAR BEM?</h2>
+            </section>
+
+            <!-- Slide 43: Produtividade é errada -->
+            <section style="text-align: center;">
+                <h2 style="color: var(--danger);">PRODUTIVIDADE É A MÉTRICA ERRADA</h2>
+                <p style="margin-top: 2rem; font-size: 1.8rem; color: var(--text-secondary);">
+                    IA oferece <span style="color: var(--text-muted);">velocidade</span>.<br>
+                    Você deve buscar <span style="color: var(--accent-blue); font-weight: 600;">qualidade</span>.
+                </p>
+            </section>
+
+            <!-- Slide 44: Framework 20-60-20 -->
+            <section>
+                <h2 style="text-align: center;">FRAMEWORK: <span style="color: var(--accent-blue);">20-60-20</span></h2>
+                
+                <div class="grid-3" style="margin-top: 2rem;">
+                    <div class="framework fragment">
+                        <h3 style="color: var(--accent-purple);">20% VOCÊ — Pré-IA</h3>
+                        <ul style="font-size: 1rem;">
+                            <li>Qual o problema real?</li>
+                            <li>O que já sei/suspeito?</li>
+                            <li>Quais minhas hipóteses?</li>
+                            <li>Como poderíamos resolver?</li>
+                            <li>Qual meu objetivo?</li>
+                        </ul>
+                    </div>
+                    <div class="framework fragment">
+                        <h3 style="color: var(--accent-blue);">60% IA — Processamento</h3>
+                        <ul style="font-size: 1rem;">
+                            <li>Explorar dados</li>
+                            <li>Gerar alternativas</li>
+                            <li>Encontrar padrões, falhas</li>
+                            <li>Desafiar assunções</li>
+                            <li>Definir formato</li>
+                        </ul>
+                    </div>
+                    <div class="framework fragment">
+                        <h3 style="color: var(--accent-purple);">20% VOCÊ — Pós-IA</h3>
+                        <ul style="font-size: 1rem;">
+                            <li>Filtrar o que importa</li>
+                            <li>Aplicar contexto</li>
+                            <li>Tomar decisão</li>
+                            <li>Assumir responsabilidade</li>
+                            <li>Revisar e dar coerência</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <p class="fragment" style="text-align: center; margin-top: 2rem; color: var(--danger); font-size: 1.4rem;">
+                    Se você pula os 20%s, você é operador de IA.
+                </p>
+            </section>
+
+            <!-- Slide 45: Princípios Ethan Mollick -->
+            <section>
+                <h2>Co-Intelligence Principles</h2>
+                <p class="source" style="margin-bottom: 1.5rem;">Ethan Mollick - Copilotando com IA</p>
+                
+                <ul class="numbered" style="margin-top: 1.5rem;">
+                    <li class="fragment">
+                        <strong>Always Invite AI to the table</strong><br>
+                        <span class="source">Traga AI para cada tarefa</span>
+                    </li>
+                    <li class="fragment">
+                        <strong>Be the Human in the Loop</strong><br>
+                        <span class="source">Você valida, sempre</span>
+                    </li>
+                    <li class="fragment">
+                        <strong>Treat AI Like a Person (But Tell It What Kind of Person It Is)</strong><br>
+                        <span class="source">Dê contexto e persona</span>
+                    </li>
+                    <li class="fragment">
+                        <strong>Assume This Is the Worst AI You Will Ever Use</strong><br>
+                        <span class="source">Só vai melhorar daqui</span>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Slide 46: Think First AI Second -->
+            <section>
+                <h2>THINK FIRST, AI SECOND</h2>
+                <p class="source" style="margin-bottom: 1rem;">Ines Lee — Every</p>
+                
+                <p style="font-size: 1.2rem;">
+                    "A sequência importa.<br>
+                    <strong>Humano → IA</strong> mantém você cognitivamente engajado.<br>
+                    <strong>IA → Humano</strong> te deixa passivo."
+                </p>
+                
+                <div class="grid-2 fragment">
+                    <div class="highlight-box accent">
+                        <h4 style="color: var(--accent-purple);">Pense PRIMEIRO:</h4>
+                        <ul style="font-size: 1rem;">
+                            <li>Capture suas hipóteses</li>
+                            <li>Mapeie o que você já sabe</li>
+                            <li>Identifique suas dúvidas</li>
+                        </ul>
+                    </div>
+                    <div class="highlight-box accent">
+                        <h4 style="color: var(--accent-blue);">Só ENTÃO use IA:</h4>
+                        <ul style="font-size: 1rem;">
+                            <li>Para desafiar suas ideias</li>
+                            <li>Revelar seus pontos cegos</li>
+                            <li>Refinar seu raciocínio</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <p class="fragment" style="text-align: center; margin-top: 1.5rem; font-size: 1.3rem;">
+                    Se você começa com IA, você fica <span style="color: var(--danger);">passivo</span>.<br>
+                    Se você começa pensando, IA <span style="color: var(--success);">amplifica</span>.
+                </p>
+            </section>
+
+            <!-- Slide 47: Shreyas Doshi -->
+            <section>
+                <h2>DON'T OUTSOURCE YOUR JUDGMENT TO AI</h2>
+                <p class="source" style="margin-bottom: 1.5rem;">Shreyas Doshi</p>
+                
+                <p style="font-size: 1.4rem; color: var(--text-secondary); margin-bottom: 2rem;">
+                    A IA deve aumentar sua habilidade bruta <em>("raw skill")</em>, não substituir o pensamento crítico.
+                </p>
+                
+                <ul class="cross-list">
+                    <li class="fragment">Não usar a IA para vencer a "síndrome da página em branco".</li>
+                    <li class="fragment">Não usar a IA para evitar ler feedback dos clientes.</li>
+                    <li class="fragment">Não usar a IA para decidir por você.</li>
+                </ul>
+            </section>
+
+            <!-- Slide 48: Foco qualidade -->
+            <section>
+                <h2>O FOCO COM A IA: MELHORAR A QUALIDADE DO SEU TRABALHO</h2>
+                
+                <div class="comparison" style="margin-top: 1.5rem;">
+                    <div class="col">
+                        <h4 style="color: var(--accent-blue);">AI PODE:</h4>
+                        <ul class="check-list" style="font-size: 1rem;">
+                            <li>Processar 10k feedbacks em um sumário</li>
+                            <li>Listar 20 features com base nos feedbacks</li>
+                            <li>Iniciar a analisar competitors</li>
+                            <li>Aprofundar 5 hipóteses</li>
+                            <li>Levantar riscos</li>
+                        </ul>
+                    </div>
+                    <div class="col">
+                        <h4 style="color: var(--accent-purple);">VOCÊ DEVE:</h4>
+                        <ul style="font-size: 1rem;">
+                            <li>Ler todos e julgar quais importam</li>
+                            <li>Saber o contexto e para onde o produto deveria evoluir</li>
+                            <li>Definir estratégia</li>
+                            <li>Pensar e definir quais são as hipóteses essenciais</li>
+                            <li>Saber os impactos</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="lesson fragment" style="margin-top: 1.5rem;">
+                    <p style="font-size: 1.3rem;">Use IA para melhorar a qualidade do seu julgamento.</p>
+                    <p style="font-size: 1rem; color: var(--text-muted); margin-top: 0.5rem;">
+                        Mais dados → Encontrar padrões | Mais opções → Ampliar ideias | Mais perspectivas → Aprofundar o pensamento
+                    </p>
+                </div>
+            </section>
+
+            <!-- Slide 49: Exemplo Bom vs Ruim -->
+            <section>
+                <div class="highlight-box warning">
+                    <h4 style="color: var(--danger); margin-bottom: 0.5rem;">❌ RUIM:</h4>
+                    <p style="font-size: 1.3rem; font-family: var(--font-mono);">"Faça uma análise competitiva do Stripe"</p>
+                </div>
+                
+                <div class="highlight-box success fragment" style="margin-top: 1.5rem;">
+                    <h4 style="color: var(--success); margin-bottom: 0.5rem;">✓ BOM:</h4>
+                    <p style="font-size: 1.3rem; font-family: var(--font-mono);">
+                        "Tenho 3 hipóteses sobre por que Stripe domina:<br>
+                        1) Melhor docs, 2) Pricing, 3) DX<br>
+                        Desafie cada uma. Mostre evidências contra."
+                    </p>
+                </div>
+                
+                <p class="fragment" style="text-align: center; margin-top: 2rem; font-size: 1.4rem; color: var(--text-secondary);">
+                    O segundo força <strong style="color: var(--accent-blue);">VOCÊ</strong> a pensar primeiro.<br>
+                    IA só entra para desafiar seu raciocínio.
+                </p>
+            </section>
+
+            <!-- Slide 50: Técnica 1 -->
+            <section>
+                <div class="technique">
+                    <p class="technique-number">TÉCNICA 1</p>
+                    <h3 style="color: var(--text-primary);">IA informa, você julga</h3>
+                </div>
+                
+                <div class="grid-2" style="margin-top: 1.5rem;">
+                    <div>
+                        <h4 style="color: var(--accent-purple); margin-bottom: 1rem;">Sua hipótese:</h4>
+                        <p style="font-size: 1.8rem; font-style: italic;">"Feature X não é usada porque é difícil de achar, não porque é inútil"</p>
+                    </div>
+                    <div class="fragment">
+                        <h4 style="color: var(--accent-blue); margin-bottom: 1rem;">IA processa e estrutura:</h4>
+                        <div style="font-size: 0.95rem; background: var(--bg-tertiary); padding: 1rem; border-radius: 8px;">
+                            <p>"Para testar sua hipótese:</p>
+                            <p>1. Se fosse descoberta: onboarding guiado aumentaria uso?</p>
+                            <p>2. Se fosse utilidade: quem acha continua usando?</p>
+                            <p>3. Dados necessários: heatmap, retenção</p>
+                            <p>4. Experimento: botão destacado"</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="fragment" style="margin-top: 1.5rem; text-align: center;">
+                    <p style="color: var(--accent-purple);">VOCÊ decide qual caminho testar.</p>
+                    <p style="color: var(--text-muted);">VOCÊ executa e coleta dados reais. VOCÊ interpreta resultados.</p>
+                    <p style="margin-top: 0.5rem; font-size: 1.2rem;"><strong>IA estruturou. Você julgou em cada etapa.</strong></p>
+                </div>
+            </section>
+
+            <!-- Slide 51: Técnica 2 -->
+            <section>
+                <div class="technique">
+                    <p class="technique-number">TÉCNICA 2</p>
+                    <h3 style="color: var(--text-primary);">Explore ângulos</h3>
+                </div>
+                
+                <div style="margin-top: 1.5rem;">
+                    <p style="color: var(--text-muted); font-size: 1.8rem;">Seu entendimento: "Feature: Export de relatórios. Feedback: Export é lento"</p>
+                    
+                    <div class="code-block fragment" style="margin-top: 1rem; font-size: 1.5rem;">
+                        <span class="string">"Quais 5 razões alternativas (além de performance)?<br>Pense como: UX designer, Analista de dados, IT admin, CFO, Competidor"</span>
+                    </div>
+                </div>
+                
+                <div class="fragment" style="margin-top: 1.5rem;">
+                    <h4 style="color: var(--accent-blue); margin-bottom: 1rem;">AI RETORNA:</h4>
+                    <ul class="numbered" style="font-size: 1rem;">
+                        <li><strong>UX:</strong> Usuários exportam tudo → arquivo pesado</li>
+                        <li><strong>Analista:</strong> Querem integração c/ BI, não CSV</li>
+                        <li><strong>IT:</strong> Export sem controle = risco de dados</li>
+                        <li><strong>CFO:</strong> Cada um faz diferente = decisões inconsistentes</li>
+                        <li><strong>Competidor:</strong> Eles fazem export automático agendado</li>
+                    </ul>
+                </div>
+                
+                <p class="fragment" style="text-align: center; margin-top: 1rem; color: var(--accent-purple); font-weight: 600;">
+                    VOCÊ aprofunda e amplia o entendimento.
+                </p>
+            </section>
+
+            <!-- Slide 52: Técnica 3 Parte 1 -->
+            <section>
+                <div class="technique">
+                    <p class="technique-number">TÉCNICA 3</p>
+                    <h3 style="color: var(--text-primary);">Desenvolva ideias através de confronto</h3>
+                </div>
+                
+                <p style="margin: 1.5rem 0; font-size: 1.8rem;">
+                    <span style="color: var(--danger);">Não use IA para validar suas ideias.</span><br>
+                    Use para <strong style="color: var(--success);">DESAFIÁ-LAS</strong>.
+                </p>
+                
+                <div class="highlight-box accent fragment">
+                    <h4 style="color: var(--accent-purple);">PASSO 1: ARTICULE SEU PONTO DE VISTA (antes da IA)</h4>
+                    <p style="font-size: 1.4rem; margin-top: 0.5rem;">Escolha uma decisão de produto que você precisa tomar. Escreva:</p>
+                    <ul style="font-size: 1.4rem;">
+                        <li>Sua intuição (o que você faria)</li>
+                        <li>Por que (3 razões)</li>
+                        <li>Sua visão sobre o produto</li>
+                    </ul>
+                    
+                    <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; margin-top: 1rem; font-size: 0.95rem;">
+                        <strong>Exemplo:</strong><br>
+                        "Removeria gamificação do onboarding.<br>
+                        Motivos: 1) Infantiliza, 2) Distrai do valor real, 3) Vira métrica de vaidade<br>
+                        Minha visão: Nosso produto para advogados deve ser sério e direto"
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 53: Técnica 3 Parte 2 -->
+            <section>
+                <div class="technique">
+                    <p class="technique-number">TÉCNICA 3</p>
+                    <h3 style="color: var(--text-primary);">Desenvolva ideias através de confronto</h3>
+                </div>
+                
+                <div class="highlight-box accent fragment">
+                    <h4 style="color: var(--accent-purple);">PASSO 2: PEÇA PARA IA DESTRUIR SEU ARGUMENTO</h4>
+                
+                    <p style="font-size: 1.4rem; margin-top: 0.5rem;">Aqui está minha intuição: [cole]</p>
+                    <p style="font-size: 1.4rem; margin-top: 0.5rem;">Assuma o papel de PM que discorda completamente.</p>
+                    <ul style="font-size: 1.4rem;">
+                        <li>5 razões pelas quais estou ERRADO</li>
+                        <li>3 contra-exemplos de produtos que provam o contrário</li>
+                        <li>2 vieses cognitivos que podem estar me cegando</li>
+                        <li>perspectiva de usuário que ignoro</li>
+                    </ul>
+                    <p style="font-size: 1.4rem; margin-top: 0.5rem;">Seja brutal. Não seja gentil.</p>
+                </div>
+                
+                <p class="fragment" style="margin-top: 1.5rem; color: var(--text-muted);">Além do Prompt, forneça contexto.</p>
+                
+                <div class="highlight-box accent fragment" style="margin-top: 1rem;">
+                    <h4 style="color: var(--accent-purple);">PASSO 3: DEFENDA-SE</h4>
+                    <p style="font-size: 1rem;">Analise os contra-argumentos. Para cada um:</p>
+                    <ul style="font-size: 1rem;">
+                        <li>É válido? Por quê?</li>
+                        <li>Muda minha decisão?</li>
+                        <li>O que aprendi sobre meu próprio ponto de vista?</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 54: Técnica 3 Parte 3 -->
+            <section>
+                <div class="technique">
+                    <p class="technique-number">TÉCNICA 3</p>
+                    <h3 style="color: var(--text-primary);">Desenvolva ideias através de confronto</h3>
+                </div>
+                
+                <div class="highlight-box accent fragment">
+                    <h4 style="color: var(--accent-purple);">PASSO 4: ITERE</h4>
+                    <p style="font-size: 1.4rem; margin-top: 0.5rem;">Dado esses argumentos, aqui está minha posição REFINADA: [...]<br>
+                    Agora me desafie novamente, mas de ângulos diferentes"</p>
+                    <p style="margin-top: 1rem; color: var(--accent-blue);">→ Repita 2-3 ciclos</p>
+                </div>
+
+                <div class="lesson fragment" style="margin-top: 2rem;">
+                    <p class="lesson-label">RESULTADO</p>
+                    <p style="font-size: 1.4rem;">
+                        Você não terceirizou julgamento para IA.<br>
+                        Você <strong>AFIOU</strong> seu julgamento <strong>ATRAVÉS</strong> da IA.
+                    </p>
+                </div>
+                
+                <div class="fragment" style="margin-top: 1.5rem; text-align: center;">
+                    <p style="font-size: 1.3rem;">
+                        <span style="color: var(--danger);">❌ "IA, o que eu deveria fazer?"</span><br>
+                        <span style="color: var(--success);">✓ "Aqui está o que penso. Mostre onde estou cego."</span>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Slide 55: Checklist -->
+            <section>
+                <h2>CHECKLIST: VOCÊ ESTÁ USANDO BEM?</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Perguntas para fazer TODA vez que usar IA:</p>
+                
+                <ul class="checklist">
+                    <li class="fragment" style="padding-left: 2rem; font-size: 1.5rem;">Pensei antes de perguntar para IA?</li>
+                    <li class="fragment" style="padding-left: 2rem; font-size: 1.5rem;">Consigo defender o que a IA gerou?</li>
+                    <li class="fragment" style="padding-left: 2rem; font-size: 1.5rem;">Isso me tornou mais capaz ou mais dependente no meu trabalho de PM?</li>
+                    <li class="fragment" style="padding-left: 2rem; font-size: 1.5rem;">Alguém poderia ler isso e saber que é meu trabalho?</li>
+                    <li class="fragment" style="padding-left: 2rem; font-size: 1.5rem;">Isso desenvolveu meu julgamento ou o substituiu?</li>
+                </ul>
+                
+                <div class="highlight-box warning fragment" style="margin-top: 2rem;">
+                    <p style="font-size: 1.5rem;">
+                        Se <strong>3+ respostas</strong> são "não":<br>
+                        <span style="color: var(--danger);">Você está terceirizando, não amplificando.</span>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Slide 56: Reflexão final -->
+            <section class="interactive">
+                <h3 style="color: var(--text-muted); margin-bottom: 1.5rem;">Pense:</h3>
+                <p class="prompt">
+                    Na última semana,<br>como você usou AI?
+                </p>
+                <p class="fragment" style="margin-top: 2rem; font-size: 1.6rem; color: var(--text-secondary);">
+                    Foi para <span style="color: var(--success);">amplificar</span><br>
+                    ou para <span style="color: var(--danger);">substituir</span> você<br>
+                    no trabalho essencial?
+                </p>
+            </section>
+
+            <!-- Slide 57: Bibliografia -->
+            <section>
+                <h2>BIBLIOGRAFIA</h2>
+                
+                <div class="bibliography">
+                    <h4>📖 LIVROS</h4>
+                    <ul>
+                        <li style="font-size: 1.5rem;">Co-Intelligence — Ethan Mollick (2024)</li>
+                        <li style="font-size: 1.5rem;">Staying with the Trouble — Donna Haraway</li>
+                        <li style="font-size: 1.5rem;">Inspired — Marty Cagan (SVPG)</li>
+                    </ul>
+                    
+                    <h4>📝 ESSAYS</h4>
+                    <ul>
+                        <li style="font-size: 1.5rem;">"Cyborg Manifesto" — Donna Haraway</li>
+                        <li style="font-size: 1.5rem;">"Be Slightly Monster" — Venkatesh Rao (Contraptions)</li>
+                        <li style="font-size: 1.5rem;">"Think First, AI Second" — Ines Lee (Every)</li>
+                        <li style="font-size: 1.5rem;">"Don't Outsource Your Judgment to AI" — Shreyas Doshi</li>
+                    </ul>
+                    
+                    <h4>📊 DADOS</h4>
+                    <ul>
+                        <li style="font-size: 1.5rem;">World Economic Forum — Future of Jobs 2025</li>
+                        <li style="font-size: 1.5rem;">MIT NANDA — GenAI Divide 2025</li>
+                        <li style="font-size: 1.5rem;">London School of Economics — Bridging AI Gap</li>
+                        <li style="font-size: 1.5rem;">PwC Global Workforce Survey 2025</li>
+                        <li style="font-size: 1.5rem;">Nielsen Norman Group — AI Hallucinations</li>
+                        <li style="font-size: 1.5rem;">MIT Media Lab — Brain Scan Study (2024)</li>
+                        <li style="font-size: 1.5rem;">SVPG — AI Product Management 2 Years In</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 58: Obrigado -->
+            <section class="contact-slide divider" data-transition="zoom">
+                <h1>Obrigado!</h1>
+                <p style="font-size: 2rem; color: var(--text-primary);">Augusto Rückert</p>
+                <div class="contact-info">
+                    <a href="https://linkedin.com/in/augustoruckert" target="_blank">
+                        🔗 @augustoruckert
+                    </a>
+                    <a href="mailto:augusto@ruckert.com.br">
+                        ✉️ augusto@ruckert.com.br
+                    </a>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Reveal.js -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+    
+    <script>
+        Reveal.initialize({
+            hash: true,
+            slideNumber: 'c/t',
+            showSlideNumber: 'speaker',
+            transition: 'slide',
+            backgroundTransition: 'fade',
+            width: 1920,
+            height: 1080,
+            margin: 0.04,
+            minScale: 0.2,
+            maxScale: 2.0,
+            controls: true,
+            progress: true,
+            center: true,
+            touch: true,
+            loop: false,
+            rtl: false,
+            navigationMode: 'default',
+            shuffle: false,
+            fragments: true,
+            fragmentInURL: true,
+            embedded: false,
+            help: true,
+            pause: true,
+            showNotes: false,
+            autoPlayMedia: null,
+            preloadIframes: null,
+            autoAnimate: true,
+            autoAnimateMatcher: null,
+            autoAnimateEasing: 'ease',
+            autoAnimateDuration: 1.0,
+            autoAnimateUnmatched: true,
+            plugins: []
+        });
+    </script>
+</body>
+</html>
