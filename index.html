@@ -61,6 +61,24 @@
             margin: 0;
         }
 
+        .reveal .grid-3-responsive {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        @media screen and (max-width: 1200px) {
+            .reveal .grid-3-responsive {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .reveal .grid-3-responsive .framework {
+                padding: 1.5rem;
+            }
+        }
+
         /* ==========================================
            TYPOGRAPHY
            ========================================== */
@@ -799,7 +817,7 @@
 
             <!-- Slide 1: Título -->
             <section class="title-slide divider" data-transition="zoom">
-                <h1>AI para PMs</h1>
+                <h1>AI + PMs</h1>
                 <h2>Modos de falhar</h2>
                 <p class="author">Augusto Rückert</p>
                 <p class="date">Dezembro/2025</p>
@@ -1144,7 +1162,7 @@
 
             <!-- Slide 31: 3 colunas recusa -->
             <section>
-                <div class="grid-3">
+                <div class="grid-3-responsive">
                     <div class="framework fragment">
                         <h3>EMPRESA</h3>
                         <ul>
