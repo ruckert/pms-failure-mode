@@ -734,6 +734,22 @@
             }
         }
 
+        @keyframes rotate-pulse {
+            0%, 100% { 
+                transform: scale(1); 
+                border-color: var(--danger);
+            }
+            50% { 
+                transform: scale(1.05); 
+                border-color: #ff6b6b;
+            }
+        }
+
+        .reveal .flow-cycle .flow-item.loop-indicator {
+            animation: rotate-pulse 2s ease-in-out infinite;
+            border: 2px solid var(--danger);
+        }
+
         .reveal .animate-in {
             animation: fadeInUp 0.6s ease-out;
         }
@@ -1026,7 +1042,7 @@
                     <div class="flow-arrow">↓</div>
                     <div class="flow-item">Precisa gerar mais texto "pra compensar"</div>
                     <div class="flow-arrow">↓</div>
-                    <div class="flow-item pulse" style="border-color: var(--danger);">🔄 volta ao início</div>
+                    <div class="flow-item pulse loop-indicator" style="border-width: 2px; border-color: var(--danger);">🔄 volta ao início</div>
                 </div>
             </section>
 
