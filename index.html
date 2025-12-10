@@ -801,10 +801,34 @@
             }
             
             .reveal .grid-3,
-            .reveal .grid-4 {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
+              .reveal .grid-4 {
+                  grid-template-columns: 1fr 1fr;
+              }
+          }
+          .part-indicator {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.5rem;
+      z-index: 100;
+      opacity: 0.6;
+  }
+
+  .part-indicator .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: all 0.3s ease;
+  }
+
+  .part-indicator .dot.active {
+      background: var(--accent-blue);
+      width: 24px;
+      border-radius: 4px;
+  }
     </style>
 </head>
 <body>
@@ -1806,6 +1830,16 @@
             autoAnimateUnmatched: true,
             plugins: []
         });
+        Reveal.on('slidechanged', event => {
+    const slideIndex = event.indexh;
+    // Lógica para atualizar indicadores baseado em slideIndex
+    // Parte 1: slides 0-10
+    // Parte 2: slides 11-31
+    // Parte 3: slides 32-36
+    // Parte 4: slides 37-40
+    // Parte 5: slides 41-55
+});
+
     </script>
 </body>
 </html>
