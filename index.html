@@ -4,6 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI para PMs - Modos de Falhar | Augusto Rückert</title>
+    <meta name="description" content="Apresentação sobre os modos de falha dos PMs ao usar IA, e como usar bem a tecnologia.">
+    <meta name="author" content="Augusto Rückert">
+    <meta property="og:title" content="AI para PMs - Modos de Falhar">
+    <meta property="og:description" content="Como PMs podem falhar ao usar IA e estratégias para usar bem">
+    <meta property="og:type" content="website">
     
     <!-- Reveal.js CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reset.css">
@@ -25,7 +30,7 @@
             --bg-tertiary: #1a1a25;
             --text-primary: #f0f0f5;
             --text-secondary: #a0a0b0;
-            --text-muted: #6a6a7a;
+            --text-muted: #7a7a8a;
             --accent-blue: #00d4ff;
             --accent-purple: #7c3aed;
             --accent-gradient: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
@@ -795,15 +800,27 @@
             .reveal {
                 font-size: 24px;
             }
-            
+
             .reveal .big-number {
                 font-size: 4rem;
             }
-            
+
             .reveal .grid-3,
               .reveal .grid-4 {
                   grid-template-columns: 1fr 1fr;
               }
+          }
+
+          @media screen and (max-width: 768px) {
+            .reveal .grid-2,
+            .reveal .comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .reveal .comparison .divider-line,
+            .reveal .comparison .arrow-col {
+                display: none;
+            }
           }
           .part-indicator {
       position: fixed;
@@ -1792,6 +1809,15 @@
         </div>
     </div>
 
+    <!-- Part Indicators -->
+    <div class="part-indicator">
+        <div class="dot" data-part="1"></div>
+        <div class="dot" data-part="2"></div>
+        <div class="dot" data-part="3"></div>
+        <div class="dot" data-part="4"></div>
+        <div class="dot" data-part="5"></div>
+    </div>
+
     <!-- Reveal.js -->
     <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
     
@@ -1828,17 +1854,31 @@
             autoAnimateEasing: 'ease',
             autoAnimateDuration: 1.0,
             autoAnimateUnmatched: true,
+            keyboard: {
+                72: () => { Reveal.toggleHelp(); }, // H para help
+                77: () => { Reveal.toggleOverview(); } // M para menu/overview
+            },
             plugins: []
         });
-        Reveal.on('slidechanged', event => {
-    const slideIndex = event.indexh;
-    // Lógica para atualizar indicadores baseado em slideIndex
-    // Parte 1: slides 0-10
-    // Parte 2: slides 11-31
-    // Parte 3: slides 32-36
-    // Parte 4: slides 37-40
-    // Parte 5: slides 41-55
-});
+        // Atualizar indicadores de parte
+        function updatePartIndicators() {
+            const slideIndex = Reveal.getState().indexh;
+            const dots = document.querySelectorAll('.part-indicator .dot');
+
+            // Definir partes baseado no índice
+            let currentPart = 1;
+            if (slideIndex >= 11 && slideIndex <= 31) currentPart = 2;
+            else if (slideIndex >= 32 && slideIndex <= 36) currentPart = 3;
+            else if (slideIndex >= 37 && slideIndex <= 41) currentPart = 4;
+            else if (slideIndex >= 42 && slideIndex <= 57) currentPart = 5;
+
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index + 1 === currentPart);
+            });
+        }
+
+        Reveal.on('slidechanged', updatePartIndicators);
+        Reveal.on('ready', updatePartIndicators);
 
     </script>
 </body>
